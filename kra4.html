@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KraPoter — Handmade Clay Pottery</title>
+  <meta name="description" content="KraPoter • Handmade clay pots, mitti ke bartan, kulhads & traditional earthenware. One‑page e‑commerce with WhatsApp checkout."/>
+  <style>
+    :root{
+      --bg:#f7f3ef;
+      --card:#fffdfb;
+      --muted:#7a6f65;
+      --text:#3b3029;
+      --brand:#8b4513;     /* terracotta brown */
+      --brand-2:#d08952;   /* clay accent */
+      --accent:#2e7d32;    /* success green */
+      --danger:#e63946;
+      --shadow: 0 10px 30px rgba(0,0,0,.12);
+      --radius: 16px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color:var(--text);
+      background: var(--bg) url('https://images.unsplash.com/photo-1501200291289-c5a76c232e5e?q=80&w=1600&auto=format&fit=crop') center/cover fixed no-repeat;
+    }
+    a{color:inherit; text-decoration:none}
+    .container{max-width:1200px; margin:0 auto; padding:24px}
+
+    /* Header */
+    .header{position:sticky; top:0; z-index:20; backdrop-filter:saturate(1.3) blur(8px); background:#fffdfbcc; box-shadow:var(--shadow)}
+    .nav{display:flex; align-items:center; justify-content:space-between; gap:16px}
+    .brand{display:flex; align-items:center; gap:12px; font-weight:900; font-size:24px; color:var(--brand)}
+    .brand-logo{width:44px; height:44px; border-radius:50%; display:grid; place-items:center; background:radial-gradient(circle at 30% 30%, var(--brand-2), var(--brand));}
+    .brand-logo svg{width:28px; height:28px}
+    .nav-links{display:flex; gap:14px; font-weight:600; color:var(--muted)}
+    .nav-links a{padding:8px 10px; border-radius:10px}
+    .nav-links a:hover{background:#0000000e}
+    .search{flex:1; display:flex; justify-content:center}
+    .search input{width:100%; max-width:360px; padding:10px 14px; border:1px solid #ddd; border-radius:10px; outline:none}
+    .pill{padding:10px 14px; border-radius:999px; background:var(--brand); color:#fff; border:none; cursor:pointer; font-weight:700}
+
+    /* Hero */
+    .hero{position:relative; text-align:center; padding:90px 20px}
+    .hero::before{content:""; position:absolute; inset:0; background:linear-gradient(180deg, #fffaf5dd, #f7f3efef 60%, #f7f3ef00); z-index:-1}
+    .hero h1{font-size:44px; color:var(--brand); margin:0 0 10px}
+    .hero p{max-width:720px; margin:0 auto 18px; color:var(--muted); font-size:18px}
+    .hero-badges{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:10px}
+    .badge{background:#fff; border:1px dashed var(--brand-2); color:var(--brand); padding:8px 12px; border-radius:12px}
+
+    /* Promo strip */
+    .promo{background:#fffdfb; border-block:1px solid #ecd9c7; text-align:center; padding:10px; color:var(--brand)}
+
+    /* Products */
+    .grid{display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:20px; margin:26px 0}
+    .card{background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); overflow:hidden; display:flex; flex-direction:column; transition:transform .2s ease, box-shadow .2s ease}
+    .card:hover{transform:translateY(-4px); box-shadow:0 14px 28px rgba(0,0,0,.16)}
+    .img{aspect-ratio:4/3; display:grid; place-items:center; font-size:48px; color:white; background:var(--brand-2)}
+    .content{padding:16px; display:flex; flex-direction:column; gap:8px}
+    .title{font-weight:800}
+    .muted{color:var(--muted); font-size:14px}
+    .meta{display:flex; gap:10px; flex-wrap:wrap; font-size:12px; color:#6b5d52}
+    .chip{background:#f3e6da; padding:4px 8px; border-radius:999px}
+    .price-row{display:flex; align-items:center; justify-content:space-between; margin-top:auto}
+    .btn{padding:10px 14px; border-radius:10px; border:none; cursor:pointer; font-weight:800}
+    .btn.primary{background:var(--brand); color:#fff}
+    .btn.secondary{background:var(--brand-2); color:#fff}
+    .btn.ghost{background:#fff; border:1px solid #e7d7c6; color:var(--brand)}
+
+    /* Drawer Cart */
+    .drawer{position:fixed; inset:0; display:none}
+    .drawer.open{display:block}
+    .drawer-bg{position:absolute; inset:0; background:rgba(0,0,0,.5)}
+    .drawer-panel{position:absolute; right:0; top:0; bottom:0; width:min(460px,100%); background:#fff; display:flex; flex-direction:column; box-shadow:var(--shadow)}
+    .drawer-header{padding:16px; font-weight:900; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center}
+    .cart-items{padding:12px; flex:1; overflow:auto; display:flex; flex-direction:column; gap:10px}
+    .cart-row{display:grid; grid-template-columns:auto 1fr auto; align-items:center; gap:10px; background:#fdfaf7; padding:8px; border-radius:10px}
+    .qty{display:flex; align-items:center; gap:6px}
+    .qty button{padding:6px 10px}
+    .cart-summary{padding:16px; border-top:1px solid #eee; display:grid; gap:10px}
+
+    /* Customer form in cart */
+    .form{display:grid; gap:10px}
+    .form input, .form textarea{padding:10px 12px; border:1px solid #ddd; border-radius:10px; font-size:14px}
+    .form small{color:var(--muted)}
+    .note{background:#f8fff8; border:1px solid #d8f0d8; color:#234; padding:8px 12px; border-radius:10px}
+
+    /* Info Sections (accordion) */
+    .accordion{margin:40px auto; max-width:1000px}
+    .acc-item{background:#ffffffcc; backdrop-filter:blur(4px); border-radius:var(--radius); margin-bottom:12px; box-shadow:var(--shadow); overflow:hidden}
+    .acc-head{padding:16px; font-weight:800; cursor:pointer; background:var(--brand); color:#fff; display:flex; justify-content:space-between; align-items:center}
+    .acc-body{display:none; padding:16px; color:var(--text); background:#fffdfb}
+    .acc-item.open .acc-body{display:block}
+
+    /* Footer */
+    footer{background:#fffdfbcc; backdrop-filter: blur(6px); text-align:center; padding:24px; color:var(--muted)}
+    footer .fnav{display:flex; gap:14px; justify-content:center; margin-top:10px}
+
+    /* Utilities */
+    .sr{position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); border:0}
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header" id="home">
+    <div class="container nav">
+      <a href="#home"  class="brand" aria-label="KRA potter">
+        <div class="brand-logo" aria-hidden="true">
+          <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <defs>
+              <linearGradient id="clay" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#d08952"/>
+                <stop offset="100%" stop-color="#8b4513"/>
+              </linearGradient>
+            </defs>
+            <circle cx="32" cy="32" r="30" fill="url(#clay)"/>
+            <path d="M20 20c0-3 6-5 12-5s12 2 12 5v3h-3c.6 1.1.4 2.4-.3 3.4 2.4 1.2 4 3 4.4 5.2 1 6-7 16.4-13.1 16.4S16 37.6 17 31.6c.4-2.1 2-4 4.4-5.2-.8-1-.9-2.3-.3-3.4H20v-3z" fill="#fff" opacity=".95"/>
+          </svg>
+        </div>
+        KRA<span style="background:linear-gradient(90deg,var(--brand-2),var(--brand)); -webkit-background-clip:text; background-clip:text; color:transparent">Potter</span>
+      </a>
+      <nav class="nav-links">
+        <a href="#products">Products</a>
+        <a href="#about">About</a>
+        <a href="#care">Care</a>
+        <a href="#reviews">Reviews</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <div class="search">
+        <input id="searchInput" placeholder="Search pottery…" />
+      </div>
+      <button class="pill" id="openCart">🛒 Cart <span id="cartCount">0</span></button>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <h1>The Art of <em style="font-family:cursive; background:linear-gradient(90deg,#a56a3a,#8b4513); -webkit-background-clip:text; background-clip:text; color:transparent">Potter</em> & Clay</h1>
+    <p>Premium handmade clay pots, mitti ke bartan, kulhads & more. Eco‑friendly, healthy & traditional — crafted with love by Indian artisans.</p>
+    <div>
+      <a class="btn primary" href="#products">Shop Now</a>
+      <a class="btn ghost" href="#about">Learn More</a>
+    </div>
+    <div class="hero-badges">
+      <span class="badge">🚚 Free shipping over ₹999</span>
+      <span class="badge">🛡️ Easy 7‑day returns</span>
+      <span class="badge">🇮🇳 Made in India</span>
+    </div>
+  </section>
+
+  <div class="promo">Festival Offer: Buy 2 Get 1 Kulhad Free • Use code <strong>KRAFEST</strong></div>
+
+  <!-- Products -->
+  <section class="container" id="products">
+    <h2 style="margin:10px 0 0">Best Sellers</h2>
+    <p class="muted" style="margin:6px 0 14px">Choose from our curated, everyday favorites.</p>
+    <div class="grid" id="productGrid"></div>
+  </section>
+
+  <!-- Info Sections (Accordion) -->
+  <section class="accordion container" id="about">
+    <div class="acc-item">
+      <div class="acc-head">About Us <span>＋</span></div>
+      <div class="acc-body">KraPoter celebrates Indian pottery. Humare artisans mitti ko roop dete hain — healthy, eco‑friendly aur sundar bartan jo ghar ko desi feel dete hain.</div>
+    </div>
+    <div class="acc-item">
+      <div class="acc-head">Why Choose Us? <span>＋</span></div>
+      <div class="acc-body">
+        <ul>
+          <li>🌿 100% Natural & Eco‑friendly</li>
+          <li>👩‍🎨 Traditional Handmade Craft</li>
+          <li>🍲 Enhances flavour & keeps food healthy</li>
+          <li>⚡ Fast Delivery & Easy Returns</li>
+        </ul>
+      </div>
+    </div>
+    <div class="acc-item" id="care">
+      <div class="acc-head">Clay Pot Care Guide <span>＋</span></div>
+      <div class="acc-body">
+        <ul>
+          <li>First use: pot ko paani me 6–8 ghante bhigo kar rakhein.</li>
+          <li>Cooking: low–medium flame par istemal karein.</li>
+          <li>Cleaning: harsh soap avoid; garam paani se rinse karein.</li>
+          <li>Drying: hamesha dhoop me achchhe se sukhaayein.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="acc-item" id="reviews">
+      <div class="acc-head">Customer Reviews <span>＋</span></div>
+      <div class="acc-body">
+        <p>⭐⭐⭐⭐⭐ “Water tastes so fresh in matka.” – Neha</p>
+        <p>⭐⭐⭐⭐⭐ “Perfect kulhads for chai!” – Aman</p>
+        <p>⭐⭐⭐⭐⭐ “Beautiful handi; adds earthy flavour.” – Ramesh</p>
+      </div>
+    </div>
+    <div class="acc-item" id="faq">
+      <div class="acc-head">FAQ <span>＋</span></div>
+      <div class="acc-body">
+        <p><strong>Q:</strong> Gas par use ho sakta hai? <br><strong>A:</strong> Haan, low–medium flame par.</p>
+        <p><strong>Q:</strong> Delivery kitne din me? <br><strong>A:</strong> Usually 3–5 din.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Drawer Cart (with Customer Form) -->
+  <div class="drawer" id="cartDrawer" aria-hidden="true">
+    <div class="drawer-bg" onclick="closeCart()"></div>
+    <div class="drawer-panel">
+      <div class="drawer-header">Your Cart <button class="btn ghost" onclick="closeCart()">✕</button></div>
+      <div class="cart-items" id="cartItems"></div>
+      <div class="cart-summary">
+        <div style="display:flex; justify-content:space-between">
+          <div>Subtotal:</div>
+          <div><strong id="sumSubtotal">₹0</strong></div>
+        </div>
+        <div class="note">Checkout pe WhatsApp khulega. Details verify karke bas send dabayein.</div>
+        <form class="form" id="customerForm">
+          <input id="custName" placeholder="Full Name" required />
+          <input id="custPhone" placeholder="Mobile Number" required />
+          <textarea id="custAddress" rows="3" placeholder="Full Address" required></textarea>
+          <input id="custPincode" placeholder="Pincode" required />
+          <small>By placing order you agree to our friendly return & privacy policy.</small>
+        </form>
+        <button class="btn primary" onclick="checkout()">Checkout via WhatsApp</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact / Footer -->
+  <section class="container" id="contact" style="margin-top:30px">
+    <div style="background:#fff; border-radius:16px; box-shadow:var(--shadow); padding:20px; display:grid; gap:8px; place-items:center">
+      <h3 style="margin:0; color:var(--brand)">Questions? Get in touch</h3>
+      <p class="muted" style="text-align:center">WhatsApp par likhiye ya call kariye — hum madad ke liye hamesha tayyar hain.</p>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center">
+        <a class="btn secondary" target="_blank" href="https://wa.me/916265420452?text=Hi%20KraPoter%2C%20I%20have%20a%20question">Chat on WhatsApp</a>
+        <a class="btn ghost" href="tel:+916265420452">📞 Call: +91 62654 20452</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:6px">
+      <div class="brand-logo" aria-hidden="true">
+        <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="clayF" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#d08952"/><stop offset="100%" stop-color="#8b4513"/></linearGradient></defs><circle cx="32" cy="32" r="30" fill="url(#clayF)"/><path d="M20 20c0-3 6-5 12-5s12 2 12 5v3h-3c.6 1.1.4 2.4-.3 3.4 2.4 1.2 4 3 4.4 5.2 1 6-7 16.4-13.1 16.4S16 37.6 17 31.6c.4-2.1 2-4 4.4-5.2-.8-1-.9-2.3-.3-3.4H20v-3z" fill="#fff" opacity=".95"/></svg>
+      </div>
+      <strong>KraPoter</strong>
+    </div>
+    © <span id="year"></span> KraPoter — Handmade Clay Pottery
+    <div class="fnav"><a href="#home">Home</a><a href="#products">Products</a><a href="#about">About</a><a href="#contact">Contact</a></div>
+  </footer>
+
+  <script>
+    /* ---------------- Data ---------------- */
+    const PRODUCTS = [
+      {id:1, name:"Clay Water Pot (Matka)", price:799, desc:"Keeps water naturally cool.", icon:"🥥" , tags:["3L","Porous","Cooling"], img:""},
+      {id:2, name:"Clay Kulhad Set (6 pcs)", price:349, desc:"Perfect for tea & lassi.", icon:"🍵", tags:["150ml","Glazed rim","Gift pack"], img:""},
+      {id:3, name:"Handi (Cooking Pot)", price:999, desc:"Earthen flavour in curries.", icon:"🍲", tags:["Gas safe","2.5L","Lid"], img:""},
+      {id:4, name:"Clay Plate Thali", price:449, desc:"Eco‑friendly dining.", icon:"🍽️", tags:["10‑inch","Microwave safe"], img:""},
+      {id:5, name:"Clay Diyas (Pack of 10)", price:199, desc:"For festivals & decor.", icon:"🪔", tags:["Small","Reusable"], img:""},
+      {id:6, name:"Earthen Bottle (Ghadu)", price:599, desc:"Naturally cool sips.", icon:"🧴", tags:["1L","Travel"], img:""}
+    ];
+
+    const els = {
+      grid: document.getElementById('productGrid'),
+      cartItems: document.getElementById('cartItems'),
+      cartCount: document.getElementById('cartCount'),
+      sumSubtotal: document.getElementById('sumSubtotal'),
+      drawer: document.getElementById('cartDrawer'),
+      form: document.getElementById('customerForm')
+    };
+
+    let cart = {}; // {id: qty}
+
+    const fmt = n => `₹${n}`;
+
+    /* ---------------- Render Products ---------------- */
+    function renderProducts(list=PRODUCTS){
+      const q = (document.getElementById('searchInput').value||'').toLowerCase();
+      const filtered = list.filter(p=> p.name.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q) || (p.tags||[]).some(t=>t.toLowerCase().includes(q)) );
+      els.grid.innerHTML = filtered.map(p=>`
+        <div class="card">
+          <div class="img">${p.icon}</div>
+          <div class="content">
+            <div class="title">${p.name}</div>
+            <div class="muted">${p.desc}</div>
+            <div class="meta">${(p.tags||[]).map(t=>`<span class="chip">${t}</span>`).join('')}</div>
+            <div class="price-row">
+              <strong>${fmt(p.price)}</strong>
+              <div style="display:flex; gap:8px">
+                <button class="btn secondary" onclick="addToCart(${p.id})">Add</button>
+                <a class="btn ghost" target="_blank" href="https://wa.me/916265420452?text=Hi%20I%20want%20${encodeURIComponent(p.name)}%20(${fmt(p.price)})">WhatsApp</a>
+              </div>
+            </div>
+          </div>
+        </div>`).join('');
+    }
+
+    /* ---------------- Cart Logic ---------------- */
+    function addToCart(id){ cart[id]=(cart[id]||0)+1; updateCart(); openCart(); }
+    function decQty(id){ if(!cart[id]) return; cart[id]--; if(cart[id]<=0) delete cart[id]; updateCart(); }
+    function removeFromCart(id){ delete cart[id]; updateCart(); }
+
+    function updateCart(){
+      const items = Object.entries(cart).map(([id,qty])=>({...PRODUCTS.find(p=>p.id==id), qty}));
+      document.getElementById('cartCount').textContent = items.reduce((s,i)=>s+i.qty,0);
+      if(!items.length){ els.cartItems.innerHTML = `<div style='text-align:center;color:gray'>Cart is empty</div>`; els.sumSubtotal.textContent = fmt(0); return; }
+
+      els.cartItems.innerHTML = items.map(i=>`
+        <div class="cart-row">
+          <div style="font-size:26px">${i.icon}</div>
+          <div>
+            <div style="font-weight:700">${i.name}</div>
+            <small class="muted">${fmt(i.price)} each</small>
+          </div>
+          <div class="qty">
+            <button class="btn ghost" onclick="decQty(${i.id})">−</button>
+            <strong>${i.qty}</strong>
+            <button class="btn ghost" onclick="addToCart(${i.id})">＋</button>
+            <button class="btn" style="margin-left:8px" onclick="removeFromCart(${i.id})">✕</button>
+          </div>
+        </div>`).join('');
+
+      const subtotal = items.reduce((s,i)=>s+i.price*i.qty,0);
+      els.sumSubtotal.textContent = fmt(subtotal);
+    }
+
+    function openCart(){ els.drawer.classList.add('open'); }
+    function closeCart(){ els.drawer.classList.remove('open'); }
+
+    /* ---------------- Checkout (WhatsApp) ---------------- */
+    function checkout(){
+      const items = Object.entries(cart).map(([id,qty])=>({...PRODUCTS.find(p=>p.id==id), qty}));
+      if(!items.length){ alert('Cart is empty!'); return; }
+
+      // simple form validation
+      const name = document.getElementById('custName').value.trim();
+      const phone = document.getElementById('custPhone').value.trim();
+      const address = document.getElementById('custAddress').value.trim();
+      const pincode = document.getElementById('custPincode').value.trim();
+      if(!name || !phone || !address || !pincode){ alert('Please fill Name, Phone, Address & Pincode.'); return; }
+
+      const subtotal = items.reduce((s,i)=>s+i.price*i.qty,0);
+      const orderNo = Math.floor(100000 + Math.random()*900000);
+
+      let lines = [];
+      lines.push(`Order #${orderNo}`);
+      lines.push(`Name: ${name}`);
+      lines.push(`Phone: ${phone}`);
+      lines.push(`Address: ${address}`);
+      lines.push(`Pincode: ${pincode}`);
+      lines.push('Items:');
+      items.forEach(i=> lines.push(`• ${i.name} x ${i.qty} = ${fmt(i.price*i.qty)}`));
+      lines.push(`Total: ${fmt(subtotal)}`);
+
+      const msg = encodeURIComponent(lines.join('\n'));
+      window.open(`https://wa.me/916265420452?text=${msg}`, '_blank');
+
+      // reset
+      cart = {}; updateCart(); els.form.reset(); closeCart();
+    }
+
+    /* ---------------- UI Hooks ---------------- */
+    document.getElementById('openCart').addEventListener('click', openCart);
+    document.getElementById('searchInput').addEventListener('input', ()=>renderProducts());
+    document.getElementById('year').textContent = new Date().getFullYear();
+    renderProducts(); updateCart();
+
+    // smooth scroll for nav
+    document.querySelectorAll('.nav-links a').forEach(a=>{
+      a.addEventListener('click', e=>{
+        const href = a.getAttribute('href');
+        if(href.startsWith('#')){ e.preventDefault(); document.querySelector(href).scrollIntoView({behavior:'smooth'}); }
+      });
+    });
+
+    // accordion toggles
+    document.querySelectorAll('.acc-head').forEach(h=>{
+      h.addEventListener('click', ()=> h.parentElement.classList.toggle('open'));
+    });
+  </script>
+</body>
+</html>
